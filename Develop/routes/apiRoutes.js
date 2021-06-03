@@ -1,9 +1,8 @@
 // LOAD DATA
 // We are linking our routes to a series of "data" sources.
-// These data sources hold arrays of information on table-data, waitinglist, etc.
+// These data sources hold arrays of information on notes data
 
-const tableData = require('../data/tableData');
-const waitListData = require('../data/waitinglistData');
+const notesData = require('../db/db.json');
 
 // ROUTING
 
@@ -16,7 +15,6 @@ module.exports = (app) => {
 
   app.get('/api/tables', (req, res) => res.json(tableData));
 
-  app.get('/api/waitlist', (req, res) => res.json(waitListData));
 
   // API POST Requests
   // Below code handles when a user submits a form and thus submits data to the server.
