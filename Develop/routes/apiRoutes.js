@@ -58,15 +58,35 @@ module.exports = (app) => {
       }
     });
   });
+
+  app.delete('/api/notes/:id', (req, res) => {
+    console.log('DELETE /api/notes/:id called');
+    console.log('req.params:\n', JSON.stringify(req.params, null, 2));
+    console.log('req.body:\n', JSON.stringify(req.body, null, 2));
+
+    const idToDelete = req.params.id;
+    console.log('idToDelete:', idToDelete);
+    const indexToDelete = notes.findIndex(note => note.id === idToDelete);
+    console.log('indexToDelete:', indexToDelete);
+
+    if (indexToDelete > -1) {
+      // https://stackoverflow.com/questions/5767325/how-can-i-remove-a-specific-item-from-an-array
+      notes.splice(indexToDelete, 1);
+      console.log('2. notes just became:\n', JSON.stringify(notes, null, 2));
+      // TODO: Put this fs.writeFile() in a common method so we're not duplicating code ...
+      fs.writeFile('db/db.json', JSON.stringify(notes, null, 2), err => {
+        if (err) {
+          console.error('2. Error writing to db.json:', err);
+          res.json(false);
+        } else {
+          console.log('2. Successfully wrote to db.json');
+          res.json(true);
+        }
+      });
+    } else {
+      console.error(`Tried to delete id=${idToDelete} which doesn't exist!`);
+      res.json(false);
+    }
+  });
 }
-
-  // I added this below code so you could clear out the table while working with the functionality.
-
-//   app.post('/api/clear', (req, res) => {
-//     // Empty out the arrays of data
-//     tableData.length = 0;
-//     waitListData.length = 0;
-
-//     res.json({ ok: true });
-//   });
 
