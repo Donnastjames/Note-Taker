@@ -1,5 +1,7 @@
 // Package needed for this application
 const { json } = require('body-parser');
+// https://www.npmjs.com/package/uuid
+const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 
 // LOAD DATA
@@ -39,7 +41,10 @@ module.exports = (app) => {
     console.log('req.params:\n', JSON.stringify(req.params, null, 2));
     console.log('req.body:\n', JSON.stringify(req.body, null, 2));
    
-    const newNote = req.body;
+    // Stick a unique id into each newNote for keeping track of later.
+    // We can't require('uuid') in code run on the client, so we must
+    // do it here in the server ...
+    const newNote = { ...req.body, id: uuidv4() };
     notes.push(newNote);
     console.log('notes just became:\n', JSON.stringify(notes, null, 2));
 
