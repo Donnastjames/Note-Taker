@@ -1,61 +1,59 @@
 // Package needed for this application
+const { json } = require('body-parser');
 const fs = require('fs');
 
 // LOAD DATA
 // We are linking our routes to a series of "data" sources.
-// These data sources hold arrays of information on notes data
+// This data sources holds an array of information on notes data ...
 
 const notes = require('../db/db.json');
+
+console.log('requiring notes gave rise to:\n', JSON.stringify(notes, null, 2));
 
 // ROUTING
 
 module.exports = (app) => {
   // API GET Requests
-  // Below code handles when users "visit" a page.
-  // When a user visits a link, ex: localhost:PORT/api/admin... 
-  // (they are shown a JSON of the data in the notes)
+  // When someone does a GET request, we respond by giving them the notes[] array.
   // ---------------------------------------------------------------------------
 
   app.get('/api/notes', (req, res) => {
     console.log('GET /api/notes called');
+    console.log('req.params:\n', JSON.stringify(req.params, null, 2));
     console.log('req.body:\n', JSON.stringify(req.body, null, 2));
-    return res.json(notes);
+    console.log('returning notes:\n', JSON.stringify(notes, null, 2));
+    res.json(notes);
   });
 
   // API POST Requests
   // Below code handles when a user submits a form and thus submits data to the server.
-  // When a user submits form data (a JSON object)
-  // ...the JSON is pushed to the db.json array
-  // (ex. User adds a note... this data is then sent to the server...
-  // Then the server saves the data to the notesData-db.json file)
+  // When a user POSTs /api/notes (a JSON object)
+  // ...the JSON is pushed to the notes array
+  // (ex. User adds a note... this data has been sent to the server...
+  // Then the server writes the updated notes to the db.json file.
+  // This way, when the app re-loads, the notes persist from the db.json file.
   // ---------------------------------------------------------------------------
 
   app.post('/api/notes', (req, res) => {
     console.log('POST /api/notes called');
+    console.log('req.params:\n', JSON.stringify(req.params, null, 2));
     console.log('req.body:\n', JSON.stringify(req.body, null, 2));
-    res.send({ body: 'POST /api/notes response!!!' });
-    /*
+   
     const newNote = req.body;
-  
     notes.push(newNote);
-    res.json(newNote);
-    // Note the code here. Our "server" will respond to requests and show users their saved notes.
-    // It will do this by sending out the value "true" have a note
-    // req.body is available since we're using the body parsing middleware
-    if (notes.length > 0) {
-      notes.push(req.body);
-      res.json(true);
-    } else {
-      res.json(false);
-    }
-    */
-  });
+    console.log('notes just became:\n', JSON.stringify(notes, null, 2));
 
-  function writeToFile(newNote, data) {
-    fs.writeFile(newNote, data, err =>
-      err ? console.error(err) : console.log(`Successfully created"${newNote}"`)
-      );
-  }
+    fs.writeFile('db/db.json', JSON.stringify(notes, null, 2), err => {
+      if (err) {
+        console.error('Error writing to db.json:', err);
+        res.json(false);
+      } else {
+        console.log('Successfully wrote to db.json');
+        res.json(true);
+      }
+    });
+  });
+}
 
   // I added this below code so you could clear out the table while working with the functionality.
 
@@ -66,4 +64,4 @@ module.exports = (app) => {
 
 //     res.json({ ok: true });
 //   });
-};
+
