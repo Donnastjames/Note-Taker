@@ -12,6 +12,17 @@ const notes = require('../db/db.json');
 
 console.log('requiring notes gave rise to:\n', JSON.stringify(notes, null, 2));
 
+const saveNotes = res => fs.writeFile('db/db.json', JSON.stringify(notes, null, 2), err => {
+  if (err) {
+    console.error('Error writing to db.json:', err);
+    res.json(false);
+  } else {
+    console.log('Successfully wrote to db.json');
+    res.json(true);
+  }
+});
+
+
 // ROUTING
 
 module.exports = (app) => {
@@ -47,16 +58,7 @@ module.exports = (app) => {
     const newNote = { ...req.body, id: uuidv4() };
     notes.push(newNote);
     console.log('notes just became:\n', JSON.stringify(notes, null, 2));
-
-    fs.writeFile('db/db.json', JSON.stringify(notes, null, 2), err => {
-      if (err) {
-        console.error('Error writing to db.json:', err);
-        res.json(false);
-      } else {
-        console.log('Successfully wrote to db.json');
-        res.json(true);
-      }
-    });
+    saveNotes(res);
   });
 
   app.delete('/api/notes/:id', (req, res) => {
@@ -73,16 +75,7 @@ module.exports = (app) => {
       // https://stackoverflow.com/questions/5767325/how-can-i-remove-a-specific-item-from-an-array
       notes.splice(indexToDelete, 1);
       console.log('2. notes just became:\n', JSON.stringify(notes, null, 2));
-      // TODO: Put this fs.writeFile() in a common method so we're not duplicating code ...
-      fs.writeFile('db/db.json', JSON.stringify(notes, null, 2), err => {
-        if (err) {
-          console.error('2. Error writing to db.json:', err);
-          res.json(false);
-        } else {
-          console.log('2. Successfully wrote to db.json');
-          res.json(true);
-        }
-      });
+      saveNotes(res);
     } else {
       console.error(`Tried to delete id=${idToDelete} which doesn't exist!`);
       res.json(false);
