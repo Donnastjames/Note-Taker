@@ -1,4 +1,7 @@
 {
+  "name": "note-taker",
+  "version": "1.0.0",
+  "description": "Note taking application",
   "scripts": {
     "postinstall": "npm install --prefix ./Develop",
     "start": "npm start --prefix ./Develop"
