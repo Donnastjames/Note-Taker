@@ -1,5 +1,4 @@
-// Package needed for this application
-const { json } = require('body-parser');
+// Packages needed for this application
 // https://www.npmjs.com/package/uuid
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
@@ -9,8 +8,6 @@ const fs = require('fs');
 // This data sources holds an array of information on notes data ...
 
 const notes = require('../db/db.json');
-
-console.log('requiring notes gave rise to:\n', JSON.stringify(notes, null, 2));
 
 const saveNotes = res => fs.writeFile('db/db.json', JSON.stringify(notes, null, 2), err => {
   if (err) {
@@ -31,10 +28,6 @@ module.exports = (app) => {
   // ---------------------------------------------------------------------------
 
   app.get('/api/notes', (req, res) => {
-    console.log('GET /api/notes called');
-    console.log('req.params:\n', JSON.stringify(req.params, null, 2));
-    console.log('req.body:\n', JSON.stringify(req.body, null, 2));
-    console.log('returning notes:\n', JSON.stringify(notes, null, 2));
     res.json(notes);
   });
 
@@ -47,34 +40,22 @@ module.exports = (app) => {
   // This way, when the app re-loads, the notes persist from the db.json file.
   // ---------------------------------------------------------------------------
 
-  app.post('/api/notes', (req, res) => {
-    console.log('POST /api/notes called');
-    console.log('req.params:\n', JSON.stringify(req.params, null, 2));
-    console.log('req.body:\n', JSON.stringify(req.body, null, 2));
-   
+  app.post('/api/notes', (req, res) => {   
     // Stick a unique id into each newNote for keeping track of later.
     // We can't require('uuid') in code run on the client, so we must
     // do it here in the server ...
     const newNote = { ...req.body, id: uuidv4() };
     notes.push(newNote);
-    console.log('notes just became:\n', JSON.stringify(notes, null, 2));
     saveNotes(res);
   });
 
   app.delete('/api/notes/:id', (req, res) => {
-    console.log('DELETE /api/notes/:id called');
-    console.log('req.params:\n', JSON.stringify(req.params, null, 2));
-    console.log('req.body:\n', JSON.stringify(req.body, null, 2));
-
     const idToDelete = req.params.id;
-    console.log('idToDelete:', idToDelete);
     const indexToDelete = notes.findIndex(note => note.id === idToDelete);
-    console.log('indexToDelete:', indexToDelete);
 
     if (indexToDelete > -1) {
       // https://stackoverflow.com/questions/5767325/how-can-i-remove-a-specific-item-from-an-array
       notes.splice(indexToDelete, 1);
-      console.log('2. notes just became:\n', JSON.stringify(notes, null, 2));
       saveNotes(res);
     } else {
       console.error(`Tried to delete id=${idToDelete} which doesn't exist!`);

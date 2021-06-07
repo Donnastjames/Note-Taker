@@ -11,16 +11,12 @@ module.exports = (app) => {
   // In each of the below cases the user is shown an HTML page of content
 
   app.get('/notes', (req, res) => {
-    console.log('GET /notes called');
-    console.log('req.body:\n', JSON.stringify(req.body, null, 2));
     res.sendFile(path.join(__dirname, '../public/notes.html'));
   });
 
 
   // If no matching route is found default to home
   app.get('*', (req, res) => {
-    console.log('GET * called');
-    console.log('req.body:\n', JSON.stringify(req.body, null, 2));
     res.sendFile(path.join(__dirname, '../public/index.html'));
   });
 };
